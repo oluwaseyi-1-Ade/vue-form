@@ -38,7 +38,7 @@
           type="submit"
           class="outline-none px-5 py-[10px] bg-blue-500 text-white rounded-[10px]"
         >
-          Create Account
+          Login
         </button>
       </div>
     </form>
