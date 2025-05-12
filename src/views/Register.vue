@@ -91,8 +91,10 @@
 import { ref } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
+import { useToast } from 'vue-toastification'
 
 const router = useRouter()
+const toast = useToast()
 
 const formValues = ref({
   email: '',
@@ -116,7 +118,7 @@ const handleSubmit = async () => {
       },
     )
     console.log(response.data)
-    console.log('Registration successful')
+    toast.success('Registration successful')
     router.push('/login')
 
     formValues.value = {
@@ -127,7 +129,9 @@ const handleSubmit = async () => {
       businessName: '',
     }
   } catch (error) {
-    console.error('Error:', error.response.data)
+    console.error(error.response.data.message, 'here')
+
+    toast.error(error.response.data.message[0] || 'Registration failed')
   }
 }
 </script>

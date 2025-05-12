@@ -36,7 +36,8 @@
       <div class="w-fit mx-auto mt-5">
         <button
           type="submit"
-          class="outline-none px-5 py-[10px] bg-blue-500 text-white rounded-[10px]"
+          :disabled="isLoading"
+          class="btn outline-none px-5 py-[10px] bg-blue-500 text-white rounded-[10px]"
         >
           Login
         </button>
@@ -56,32 +57,51 @@
 import axios from 'axios'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useToast } from 'vue-toastification'
 
 const router = useRouter()
+const toast = useToast()
 
-const email = ref(null)
+const email = ref('')
 const password = ref('')
+const isLoading = ref(false)
 
 const handleSubmit = async () => {
-  console.log(email, password)
-
+  isLoading.value = true
   try {
+    if (email.value === '' || password.value === '') {
+      isLoading.value = false
+      toast.error('Kindly fill all inputs correctly')
+      return
+    }
+
+    console.log(email.value, password.value)
     const response = await axios.post(
       'https://jali.johnabrahamtosin.workers.dev/api/v1/auth/login',
       { email: email.value, password: password.value },
     )
     console.log(response)
+    email.value = ''
+    password.value = ''
+    const token = ref(response.data.data.token)
+    console.log(token.value)
 
-    const token = response.data.data.token
-    console.log(token)
-
-    sessionStorage.setItem('authToken', token)
-
+    sessionStorage.setItem('authToken', token.value)
     router.push('/dashboard')
+    toast.success('Login successful')
   } catch (error) {
     console.error(error)
+    toast.error(error.response.data.message || 'Login failed')
   }
+  isLoading.value = false
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.btn:disabled {
+  opacity: 0.5;
+  background-color: #ccc;
+  cursor: not-allowed;
+  transition: opacity 0.3s ease;
+}
+</style>
